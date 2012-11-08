@@ -284,22 +284,26 @@
   ];
 
   UserCatalogCtrl = [
-    '$scope', 'Company', 'Category', 'Product', function($scope, Company, Category, Product) {
+    '$scope', 'Company', 'Category', 'Product', 'Cart', '$location', function($scope, Company, Category, Product, Cart, $location) {
       $scope.companies = Company.query();
       $scope.categories = Category.query();
       $scope.products = Product.query();
       console.log($scope.categories);
       console.log($scope.companies);
-      return console.log($scope.products);
+      console.log($scope.products);
+      return $scope.add = function(product) {
+        product.quantity = 1;
+        Cart.add(product);
+        return $location.path('/cart');
+      };
     }
   ];
 
   UserIndexCtrl = ['$scope', '$http', function($scope, $http) {}];
 
   UserCartCtrl = [
-    '$scope', 'Cart', '$location', function($scope, Cart, $location) {
+    '$scope', 'Cart', '$location', 'Order', function($scope, Cart, $location, Order) {
       $scope.items = Cart.items;
-      window.cartitems = $scope.items;
       window.cart = Cart;
       $scope.total = function() {
         var item, st, subtotal, t, _i, _len;
@@ -329,13 +333,30 @@
         Cart.clear();
         return humane.log("Cart cleared.");
       };
-      return $scope.order = function() {
+      $scope.order = function() {
+        var order;
+        order = new Order();
+        order.date = Date.now() / 1000;
+        order.items = $scope.items;
+        order.$save();
+        $scope.clear();
         return $location.path('/orders');
       };
+      return $scope.$on('logout', function(event) {
+        return $scope.clear();
+      });
     }
   ];
 
-  UserOrderCtrl = ['$scope', function($scope) {}];
+  UserOrderCtrl = [
+    '$scope', 'Order', function($scope, Order) {
+      window.order = Order;
+      return Order.query(function(data) {
+        $scope.orders = data;
+        return console.log($scope.orders);
+      });
+    }
+  ];
 
   UserProfileCtrl = [
     '$scope', '$http', function($scope, $http) {
@@ -354,10 +375,17 @@
   ];
 
   MenuCtrl = [
-    '$scope', 'Cart', function($scope, Cart) {
-      $scope.order = 3;
-      return $scope.count = function() {
+    '$scope', 'Cart', '$location', '$rootScope', 'Order', function($scope, Cart, $location, $rootScope, Order) {
+      Order.query(function(data) {
+        return $scope.order = data.length;
+      });
+      $scope.count = function() {
         return Cart.items.length;
+      };
+      return $scope.logout = function() {
+        $rootScope.$broadcast('logout', {});
+        $location.path('/logout');
+        return Cart.clear();
       };
     }
   ];
@@ -558,6 +586,14 @@
           },
           isArray: true
         }
+      });
+    }
+  ]);
+
+  rest.factory('Order', [
+    '$resource', function($resource) {
+      return $resource('/orders/:id', {
+        id: '@id'
       });
     }
   ]);

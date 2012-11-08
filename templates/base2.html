@@ -67,21 +67,10 @@
 			  <li><a href="#/cart"><img src="../assets/img/cart.png"><b> Orders</b></a></li>
             </ul>	
             
-			<ul class="nav pull-right">
-                  <li id="fat-menu" class="dropdown">
-                    <a href="" class="dropdown-toggle" data-toggle="dropdown"><img src="../assets/img/user.png"><b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-					  <li>					  
-					  </li>
-					  <li class="divider"></li>
-                      <li class="nav-header">Other Menu</li>
-					  <li><a href=""><i class="icon-shopping-cart"></i> View Shopping Cart</a></li>
-					  <li><a href=""><i class="icon-cog"></i> Settings</a></li>
-					  <li><a href="/logout"><i class="icon-off"></i> Sign out</a></li>
-                    </ul>
-                  </li>
-            </ul>	 
-				<p class="navbar-text pull-right"><b>logged in as <%= username %>&nbsp;</b></p>
+			 <div ng-controller="MenuCtrl">
+          <p class="navbar-text pull-right"><a href="/logout" class="btn btn-danger" ng-click="logout()"><i class="icon-off"></i> logout <%= username %></a></p>   
+       </div>
+			
           </div>
         </div>
       </div>
