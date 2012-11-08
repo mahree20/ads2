@@ -1,1 +1,62 @@
-<p>Orders</p>
+<legend>Orders</legend>
+<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>
+				Order ID
+			</th>
+			<th>
+				Date
+			</th>
+			<th>
+				Items
+			</th>
+			<th>
+				Total
+			</th>
+			<th>DP</th>
+			<th>Paid</th>
+			<th>Claimed</th>
+			<th>Due</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="order in orders">
+			<td>
+				{{order.id}}
+			</td>
+			<td>
+				{{order.date * 1000 | date: 'mediumDate'}}
+			</td>
+			<td>
+				<table class="table table-condensed">
+					<thead>
+						<tr>
+							<th>Product</th>
+							<th>Price</th>
+							<th>Quantity</th>
+							<th>Subtotal</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="item in order.items">
+							<td>{{item.product.name}} </td>
+							<td>{{item.price | currency:""}} </td>
+							<td>{{item.quantity}} </td>
+							<td>{{item.subtotal | currency: "Php "}} </td>
+						</tr>
+						
+					</tbody>
+				</table>
+			</td>
+			<td>
+				{{order.total | currency: "Php "}}
+			</td>
+			<td>{{order.total * 0.20 | currency: "Php "}}</td>
+			<td>{{order.date_paid | date: 'mediumDate'}} </td>
+			<td>{{order.date_claimed | date: 'mediumDate' }} </td>
+			<td>{{order.due }} </td>
+		</tr>
+	</tbody>
+
+</table>

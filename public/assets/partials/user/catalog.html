@@ -19,11 +19,13 @@
 		<thead>
 			<tr>
 				<th>Product</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr ng-repeat="product in products | filter: search">
 				<td>{{product.name}} </td>
+				<td><button class="btn btn-small" ng-click="add(product)"><i class="icon-shopping-cart"></i> Add to Cart</button> </td>
 			</tr>
 		</tbody>
 	</table>

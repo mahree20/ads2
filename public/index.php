@@ -200,7 +200,10 @@ respond('GET','/product/all.json',function($req,$res){
 });
 
 respond('GET', '/user/[i:user]/orders/all.json', OrderCtrl::admin_index());
-respond('GET', '/order/all.json', OrderCtrl::user_index());
+respond('GET', '/orders', OrderCtrl::user_index());
+respond('POST','/orders', OrderCtrl::create());
+respond('GET', '/orders/[i:id]', OrderCtrl::get());
+respond('POST', '/orders/[i:id]', OrderCtrl::change());
 
 respond('GET', '/brand/[i:id].json/products', BrandCtrl::products());
 respond('GET', '/profile', ProfileCtrl::profile());

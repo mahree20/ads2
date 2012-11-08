@@ -49,7 +49,7 @@ class Order extends Model{
 	}
 
 	public function getTotal(){
-		$items = $this->items;
+		$items = $this->items ? $this->items : array();
 		$total = 0;
 		foreach ($items as $item) {
 			# code...
@@ -58,10 +58,38 @@ class Order extends Model{
 		return $total;
 	}
 
+	//************************//
+	//**** SETTERS  **********//
+	//************************//
+
+	public function setUser_id($value){
+		$this->_orm->user_id = $value;
+	}
+
+	public function setDate($value){
+		$this->_orm->date = $value;
+
+	}
+	public function setDownpayment($value){
+		$this->_orm->downpayment = $value;
+	}
+
+	public function setDate_paid($value){
+		$this->_orm->date_paid = $value;
+	}
+
+	public function setDate_claimed($value){
+		$this->_orm->date_claimed = $value;
+	}
+
+	public function setDue($value){
+		$this->_orm->due = $value;
+	}
+
 	public function as_array(){
 		$model = $this->_orm->as_array();
 		unset($model['user_id']);
-		$model['items'] = $this->items->as_array();
+		$model['items'] = $this->items ? $this->items->as_array() : null;
 		$model['user'] = array(
 				'id' => $this->user->id,
 				'fullname' => $this->user->profile->fullname
@@ -94,12 +122,7 @@ class Order extends Model{
 		}
 	}
 
-	public function setDownpayment($value){
-		$this->_orm->downpayment = $value;
-	}
-
-
-
+	
 	public function addItem($item=null){
 		if($item instanceof OrderItem){
 			$item->order = $this->id;
@@ -109,6 +132,45 @@ class Order extends Model{
 		$item = new OrderItem();
 		$item->order = $this->id;
 		return $item;
+	}
+
+	public function update($data){
+		$this->user_id 	= 	$data->user_id ? $data->user_id : $this->user_id;
+		$this->date 	= 	$data->date ? $data->date : $this->date;
+		$this->downpayment 	= 	$data->downpayment ? $data->downpayment : $this->downpayment;
+		$this->date_paid 	=	$data->date_paid ? $data->date_paid : $this->date_paid;
+		$this->date_claimed =	$data->date_claimed ? $data->date_claimed : $this->date_claimed;
+		$this->due 		=	$data->due ? $data->due : $this->due;
+
+		$this->save(); 
+	}
+
+	public static function create($data){
+		$order = new Order();
+		if($data){
+			$order->user_id 	= 	$data->user_id ? $data->user_id : $order->user_id;
+			$order->date 	= 	$data->date ? $data->date : $order->date;
+			$order->downpayment 	= 	$data->downpayment ? $data->downpayment : $order->downpayment;
+			$order->date_paid 	=	$data->date_paid ? $data->date_paid : $order->date_paid;
+			$order->date_claimed =	$data->date_claimed ? $data->date_claimed : $order->date_claimed;
+			$order->due 		=	$data->due ? $data->due : $order->due;
+			
+			$order->save();
+			
+			if($data->items){
+				foreach ($data->items as $itemdata) {
+					$item = $order->addItem();
+					$item->product = $itemdata->id;
+					$item->price = $itemdata->price;
+					$item->quantity = $itemdata->quantity;
+					$item->save();
+				}
+			}
+
+			return $order;
+		}
+		throw new Exception("$data must not be empty", 1);
+		
 	}
 
 	public static function findByUser($user_id){
