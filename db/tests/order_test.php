@@ -12,10 +12,10 @@ class OrderTest extends PHPUnit_Framework_TestCase{
 	}
 
 	public function testAttribs(){
-		$order = Order::findById(1);
+		$order = Order::findById(2);
 
 		$this->assertInstanceOf('Order', $order);
-		$this->assertEquals(1, $order->id);
+		$this->assertEquals(2, $order->id);
 		$this->assertInstanceOf('User', $order->user);
 		$this->assertNull($order->date);
 		$this->assertNull($order->date_paid);
@@ -25,7 +25,7 @@ class OrderTest extends PHPUnit_Framework_TestCase{
 	}
 
 	public function testItems(){
-		$order = Order::findById(1);
+		$order = Order::findById(2);
 		$items = $order->items;
 
 		$this->assertInstanceOf('Collection', $items);

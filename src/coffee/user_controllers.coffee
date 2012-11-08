@@ -1,10 +1,18 @@
-UserCatalogCtrl = ['$scope','Company','Category','Product', ($scope,Company, Category,Product)->
+UserCatalogCtrl = ['$scope','Company','Category','Product','Cart','$location', 
+($scope,Company, Category,Product,Cart,$location)->
 	$scope.companies = Company.query()
 	$scope.categories = Category.query()
 	$scope.products = Product.query()
+
 	console.log $scope.categories
 	console.log $scope.companies
 	console.log $scope.products
+
+	$scope.add = (product)->
+		product.quantity = 1
+		Cart.add(product)
+		$location.path('/cart')
+
 ]
 
 UserIndexCtrl = ['$scope','$http', ($scope,$http)->
@@ -12,10 +20,10 @@ UserIndexCtrl = ['$scope','$http', ($scope,$http)->
 	
 ]
 
-UserCartCtrl = ['$scope','Cart','$location', ($scope,Cart,$location)->
-			
+UserCartCtrl = ['$scope','Cart','$location','Order', ($scope,Cart,$location,Order)->
+	
 	$scope.items = Cart.items
-	window.cartitems = $scope.items
+	#window.cartitems = $scope.items
 	window.cart = Cart
 	$scope.total = ->
 		st = (item.price*item.quantity for item in $scope.items)
@@ -33,11 +41,23 @@ UserCartCtrl = ['$scope','Cart','$location', ($scope,Cart,$location)->
 		
 		humane.log("Cart cleared.")
 	$scope.order = ->
+		order = new Order()
+		order.date = Date.now() / 1000
+		order.items = $scope.items
+		order.$save()
+		$scope.clear()
 		$location.path('/orders')
+	$scope.$on('logout',(event)->
+		$scope.clear()
+	)
 ]
 
-UserOrderCtrl = ['$scope',($scope)->
-
+UserOrderCtrl = ['$scope','Order',($scope,Order)->
+	window.order = Order
+	Order.query((data)->
+		$scope.orders = data
+		console.log $scope.orders
+	)
 ]
 
 UserProfileCtrl = ['$scope','$http',($scope,$http)->
@@ -53,10 +73,19 @@ UserProfileCtrl = ['$scope','$http',($scope,$http)->
 		
 ]
 
-MenuCtrl = ['$scope','Cart', ($scope,Cart)->
-	$scope.order = 3
+MenuCtrl = ['$scope','Cart','$location','$rootScope','Order', ($scope,Cart,$location,$rootScope,Order)->
+	Order.query((data)->
+		$scope.order = data.length
+		)
+	
 	$scope.count = ->
 		Cart.items.length
+
+	$scope.logout = ->
+		#$location.path('/')
+		$rootScope.$broadcast('logout',{})
+		$location.path('/logout')
+		Cart.clear()
 ]
 
 ChangePassCtrl = ['$scope','$http',($scope,$http)->
